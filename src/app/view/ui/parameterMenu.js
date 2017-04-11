@@ -41,7 +41,7 @@ var createValueField = function(start, id) {
   var div = document.createElement("div");
   var error = document.createElement("span");
   var span = document.createElement("span");
-  span.innerHTML = "μm";
+  //span.innerHTML = "μm";
   span.style.fontSize = "14px";
   error.className = "mdl-textfield__error";
   error.innerHTML = "Digits only";
@@ -199,7 +199,9 @@ var createSliderRow = function(featureID, typeString, setString, key) {
   var sliderContainer = createTableElement(slider);
   sliderContainer.setAttribute("style", "padding-left: 0px; padding-right: 0px")
   var field = createValueField(value, fieldID);
+  field.setAttribute("style", "padding-left: 12px; padding-right: 0px")
   var fieldContainer = createTableElement(field);
+  //fieldContainer.setAttribute("style", "padding-left: 24px; padding-right: 0px")
   var row = createTableRow(sliderContainer, titleContainer, fieldContainer);
   field.oninput = generateUpdateFunction(fieldID, sliderID, typeString, setString, key);
   slider.oninput = generateUpdateFunction(sliderID, fieldID, typeString, setString, key);
