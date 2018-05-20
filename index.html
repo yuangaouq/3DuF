@@ -1,9 +1,10 @@
+<html>
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script src="lib/jquery/jquery-1.11.3.min.js"></script>
+    <script src="lib/jquery/jquery.min.js"></script>
     <script src="lib/nouislider/nouislider.min.js"></script>
     <script src="lib/paper/paper-full.min.js"></script>
     <script src="lib/filesaver/FileSaver.min.js"></script>
@@ -12,214 +13,76 @@
 
     <link rel="stylesheet" href="lib/nouislider/nouislider.min.css">
 
-    <link rel="stylesheet" href="lib/material/material.min.css">
-    <script src="lib/material/material.min.js"></script>
+    <link rel="stylesheet" href="lib/material/material-kit.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <!--<link rel="stylesheet" href="lib/bootstrap/style.css">-->
     <link rel="stylesheet" href="modified.css">
+    <script src="lib/material/popper.min.js"></script>
+    <script src="lib/material/bootstrap-material-design.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" />
 </head>
 
 <body>
-    <script>
-        // Warning before leaving the page (back button, or outgoinglink)
-        window.onbeforeunload = function() {
-            return "Do you really want to leave 3DuF?";
-            //if we return nothing here (just calling return;) then there will be no pop-up question at all
-            //return;
-        };
-    </script>
-    <div id="main_window" class="mdl-layout mdl-js-layout mdl-layout--fixed-drawer
-            mdl-layout--overlay-drawer-button ">
-        <div id="button_drawer" class="mdl-layout__drawer">
-            <img class="logo" src="img/logo.png">
-            <span class="mdl-layout-title">Select Feature</span>
-            <nav class="mdl-navigation" id="feature-misc">
+<script>
+    // Warning before leaving the page (back button, or outgoinglink)
+    window.onbeforeunload = function() {
+        return "Do you really want to leave 3DuF?";
+        //if we return nothing here (just calling return;) then there will be no pop-up question at all
+        //return;
+    };
+</script>
 
-                <div class="button_row">
-                    <a id="channel_button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised feature-button">Channel</a>
-                    <button id="channel_params_button" class="params-button mdl-button mdl-js-button mdl-button--icon">
-                        <i class="material-icons">settings</i>
-                    </button>
-                </div>
-                <div class="button_row">
-                    <a id="roundedchannel_button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised feature-button">Rounded Channel</a>
-                    <button id="roundedchannel_params_button" class="params-button mdl-button mdl-js-button mdl-button--icon">
-                        <i class="material-icons">settings</i>
-                    </button>
+<!-- Page Content Holder -->
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-2">
+            <!--<div class="navbar">-->
+                <div style="text-align:center; width: 100%; padding-top:15px ">
+                    <img width="70%" src="img/logo.png">
                 </div>
 
-                <div class="button_row">
-                    <a id="transition_button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised feature-button">Transition</a>
-                    <button id="transition_params_button" class="params-button mdl-button mdl-js-button mdl-button--icon">
-                        <i class="material-icons">settings</i>
-                    </button>
-                </div>
-                <div class="button_row">
-                    <a id="alignmentmarks_button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised feature-button">Alignment Marks</a>
-                    <button id="alignmentmarks_params_button" class="params-button mdl-button mdl-js-button mdl-button--icon">
-                        <i class="material-icons">settings</i>
-                    </button>
+                <div class="container" style=" text-align: center; padding-right: 0px; padding-left: 0px">
+
+                    <span class="navbar-text">Select Feature</span>
+                    <div class=" button_row">
+                        <a id="channel_button" class="btn feature-button">Channel</a>
+                        <button id="channel_params_button" class="params-button btn-link">
+                            <i class="material-icons">settings</i>
+                        </button>
+                    </div>
+
                 </div>
 
-            </nav>
-            <span class="mdl-layout-title">Mix</span>
-            <nav class="mdl-navigation" id="feature-mix">
-
-                <div class="button_row">
-                    <a id="bettermixer_button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised feature-button">Mixer</a>
-                    <button id="bettermixer_params_button" class="params-button mdl-button mdl-js-button mdl-button--icon">
-                <i class="material-icons">settings</i>
-            </button>
-                </div>
-                <div class="button_row">
-                    <a id="curvedmixer_button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised feature-button">Curved Mixer</a>
-                    <button id="curvedmixer_params_button" class="params-button mdl-button mdl-js-button mdl-button--icon">
-                <i class="material-icons">settings</i>
-            </button>
-                </div>
-                <div class="button_row">
-                    <a id="rotarymixer_button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised feature-button">Rotary Mixer</a>
-                    <button id="rotarymixer_params_button" class="params-button mdl-button mdl-js-button mdl-button--icon">
-                <i class="material-icons">settings</i>
-            </button>
-                </div>
-            </nav>
-            <span class="mdl-layout-title">Control</span>
-            <nav class="mdl-navigation" id="feature-control">
-
-                <div class="button_row">
-                    <a id="circleValve_button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised feature-button">Circle Valve</a>
-                    <button id="circleValve_params_button" class="params-button mdl-button mdl-js-button mdl-button--icon">
-                <i class="material-icons">settings</i>
-            </button>
-                </div>
-                <div class="button_row">
-                    <a id="valve3d_button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised feature-button">Valve3D</a>
-                    <button id="valve3d_params_button" class="params-button mdl-button mdl-js-button mdl-button--icon">
-                <i class="material-icons">settings</i>
-            </button>
-                </div>
-                <div class="button_row">
-                    <a id="valve_button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised feature-button">Valve</a>
-                    <button id="valve_params_button" class="params-button mdl-button mdl-js-button mdl-button--icon">
-                <i class="material-icons">settings</i>
-            </button>
-                </div>
-            </nav>
-
-            <span class="mdl-layout-title">Process</span>
-            <nav class="mdl-navigation" id="feature-process">
-
-                <div class="button_row">
-                    <a id="celltrapl_button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised feature-button">Cell Trap</a>
-                    <button id="celltrapl_params_button" class="params-button mdl-button mdl-js-button mdl-button--icon">
-                <i class="material-icons">settings</i>
-            </button>
-                </div>
-                <div class="button_row">
-                    <a id="diamond_button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised feature-button">Diamond Chamber</a>
-                    <button id="diamond_params_button" class="params-button mdl-button mdl-js-button mdl-button--icon">
-                <i class="material-icons">settings</i>
-            </button>
-                </div>
-                <div class="button_row">
-                    <a id="chamber_button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised feature-button">Chamber</a>
-                    <button id="chamber_params_button" class="params-button mdl-button mdl-js-button mdl-button--icon">
-                <i class="material-icons">settings</i>
-            </button>
-                </div>
-                <div class="button_row">
-                    <a id="dropletgen_button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button&#45;&#45;raised feature-button">Droplet Gen</a>
-                    <button id="dropletgen_params_button" class="params-button mdl-button mdl-js-button mdl-button&#45;&#45;icon">
-                <i class="material-icons">settings</i>
-            </button>
-                </div>
-            </nav>
-            <span class="mdl-layout-title">Distribute</span>
-
-            <nav class="mdl-navigation" id="feature-distribute">
-
-                <div class="button_row">
-                    <a id="port_button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised feature-button">Port</a>
-                    <button id="port_params_button" class="params-button mdl-button mdl-js-button mdl-button--icon">
-                    <i class="material-icons">settings</i>
-                </button>
-                </div>
-                <div class="button_row">
-                    <a id="via_button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised feature-button">Via</a>
-                    <button id="via_params_button" class="params-button mdl-button mdl-js-button mdl-button--icon">
-                    <i class="material-icons">settings</i>
-                </button>
-                </div>
-                <div class="button_row" hidden="true">
-                    <a id="mixer_button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised feature-button">Mixer</a>
-                    <button id="mixer_params_button" class="params-button mdl-button mdl-js-button mdl-button--icon">
-                    <i class="material-icons">settings</i>
-                </button>
-                </div>
-                <div class="button_row">
-                    <a id="tree_button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised feature-button">Tree</a>
-                    <button id="tree_params_button" class="params-button mdl-button mdl-js-button mdl-button--icon">
-                    <i class="material-icons">settings</i>
-                </button>
-                </div>
-                <div class="button_row">
-                    <a id="mux_button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised feature-button">Mux</a>
-                    <button id="mux_params_button" class="params-button mdl-button mdl-js-button mdl-button--icon">
-                    <i class="material-icons">settings</i>
-                </button>
-                </div>
-                <div class="button_row">
-                    <a id="transposer_button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised feature-button">Transposer</a>
-                    <button id="transposer_params_button" class="params-button mdl-button mdl-js-button mdl-button--icon">
-                    <i class="material-icons">settings</i>
-                </button>
-                </div>
-
-            </nav>
-            <span class="mdl-layout-title">QoL Operations</span>
-            <nav class="mdl-navigation" id="qol-controls">
-                <a id="revertdefaults_button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised view-button">Flow</a>
-            </nav>
-            <span class="mdl-layout-title">Select Layer</span>
-            <nav class="mdl-navigation" id="layer-controls">
-                <a id="flow_button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised view-button">Flow</a>
-                <a id="control_button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised view-button">Control</a>
-                <a id="cells_button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised view-button">Cells</a>
-            </nav>
-            <span class="mdl-layout-title">Select View</span>
-            <nav class="mdl-navigation">
-                <a id="button_2D" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised view-button">2D</a>
-                <!--<a id="button_3D" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised view-button">3D</a>-->
-            </nav>
-            <span class="mdl-layout-title">Save</span>
-            <nav class="mdl-navigation">
-                <a id="interchange_button" class="mdl-button mdl-js-button mdl-js-ripple-effect view-button">JSON (.json)</a>
-                <a id="svg_button" class="mdl-button mdl-js-button mdl-js-ripple-effect view-button">Vector Art (.svg)</a>
-                <!-- <a id="stl_button" class="mdl-button mdl-js-button mdl-js-ripple-effect view-button">3D Model (.stl)</a>-->
-            </nav>
-            <a id="infobutton" href="info.html" class="popdown btn mdl-layout-title" title="About">About/Help</a>
-            <br/>
-            <br />
-
+            <!--</div>-->
         </div>
-        <main class="mdl-layout__content">
+        <div class="col-10" style="padding-left: 0px; padding-right: 0px">
             <div id="view_container" class="page-content">
                 <div id="canvas_block" class="shown-block fade-transition">
                     <canvas id="c" tabindex="0" resize></canvas>
                 </div>
                 <div id="renderContainer" class="hidden-block fade-transition" >
                 </div>
+
             </div>
-        </main>
+
+        </div>
+
     </div>
+</div>
+</div>
+
 </body>
 
 <script src="3DuFApp.js"></script>
+<script src="lib/material/material-kit.min.js"></script>
 <script>
     $(document).ready(function() {
         $('.popdown').popdown();
     });
 </script>
+</html>
