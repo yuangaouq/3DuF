@@ -26,7 +26,11 @@
     <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons" />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" />
 </head>
-
+<style>
+    .btn{
+        background-color: rgb(238, 238, 238);
+    }
+</style>
 <body>
 <script>
     // Warning before leaving the page (back button, or outgoinglink)
@@ -40,23 +44,170 @@
 <!-- Page Content Holder -->
 <div class="container-fluid">
     <div class="row">
-        <div class="col-2">
+        <div class="col-2" style="background-color: #FAFAFA; height: 100%; overflow-y: scroll;">
             <!--<div class="navbar">-->
-                <div style="text-align:center; width: 100%; padding-top:15px ">
-                    <img width="70%" src="img/logo.png">
+            <div style="text-align:center; width: 100%; padding-top:15px ">
+                <img width="70%" src="img/logo.png">
+            </div>
+
+            <div class="container" style=" text-align: center; padding-right: 0px; padding-left: 0px">
+
+                <span class="navbar-text">Select Feature</span>
+                <div class=" button_row">
+                    <a id="channel_button" class="btn feature-button">Channel</a>
+                    <button id="channel_params_button" class="params-button btn-link">
+                        <i class="material-icons">settings</i>
+                    </button>
                 </div>
 
-                <div class="container" style=" text-align: center; padding-right: 0px; padding-left: 0px">
-
-                    <span class="navbar-text">Select Feature</span>
-                    <div class=" button_row">
-                        <a id="channel_button" class="btn feature-button">Channel</a>
-                        <button id="channel_params_button" class="params-button btn-link">
-                            <i class="material-icons">settings</i>
-                        </button>
-                    </div>
-
+                <div class="button_row">
+                    <a id="roundedchannel_button" class="btn feature-button">Rounded Channel</a>
+                    <button id="roundedchannel_params_button" class="params-button btn-link">
+                        <i class="material-icons">settings</i>
+                    </button>
                 </div>
+
+                <div class="button_row">
+                    <a id="transition_button" class="btn feature-button">Transition</a>
+                    <button id="transition_params_button" class="params-button btn-link">
+                        <i class="material-icons">settings</i>
+                    </button>
+                </div>
+                <div class="button_row">
+                    <a id="alignmentmarks_button" class="btn feature-button">Alignment Marks</a>
+                    <button id="alignmentmarks_params_button" class="params-button btn-link">
+                        <i class="material-icons">settings</i>
+                    </button>
+                </div>
+
+                <span class="navbar-text">Mix</span>
+
+                <div class="button_row">
+                    <a id="bettermixer_button" class="btn feature-button">Mixer</a>
+                    <button id="bettermixer_params_button" class="params-button btn-link">
+                        <i class="material-icons">settings</i>
+                    </button>
+                </div>
+                <div class="button_row">
+                    <a id="curvedmixer_button" class="btn feature-button">Curved Mixer</a>
+                    <button id="curvedmixer_params_button" class="params-button btn-link">
+                        <i class="material-icons">settings</i>
+                    </button>
+                </div>
+                <div class="button_row">
+                    <a id="rotarymixer_button" class="btn feature-button">Rotary Mixer</a>
+                    <button id="rotarymixer_params_button" class="params-button btn-link">
+                        <i class="material-icons">settings</i>
+                    </button>
+                </div>
+
+                <span class="navbar-text">Control</span>
+
+                <div class="button_row">
+                    <a id="circleValve_button" class="btn feature-button">Circle Valve</a>
+                    <button id="circleValve_params_button" class="params-button btn-link">
+                        <i class="material-icons">settings</i>
+                    </button>
+                </div>
+                <div class="button_row">
+                    <a id="valve3d_button" class="btn feature-button">Valve3D</a>
+                    <button id="valve3d_params_button" class="params-button btn-link">
+                        <i class="material-icons">settings</i>
+                    </button>
+                </div>
+                <div class="button_row">
+                    <a id="valve_button" class="btn feature-button">Valve</a>
+                    <button id="valve_params_button" class="params-button btn-link">
+                        <i class="material-icons">settings</i>
+                    </button>
+                </div>
+
+                <span class="navbar-text">Process</span>
+                <div class="button_row">
+                    <a id="celltrapl_button" class="btn feature-button">Cell Trap</a>
+                    <button id="celltrapl_params_button" class="params-button btn-link">
+                        <i class="material-icons">settings</i>
+                    </button>
+                </div>
+                <div class="button_row">
+                    <a id="diamond_button" class="btn feature-button">Diamond Chamber</a>
+                    <button id="diamond_params_button" class="params-button btn-link">
+                        <i class="material-icons">settings</i>
+                    </button>
+                </div>
+                <div class="button_row">
+                    <a id="chamber_button" class="btn feature-button">Chamber</a>
+                    <button id="chamber_params_button" class="params-button btn-link">
+                        <i class="material-icons">settings</i>
+                    </button>
+                </div>
+                <div class="button_row">
+                    <a id="dropletgen_button" class="btn feature-button">Droplet Gen</a>
+                    <button id="dropletgen_params_button" class="params-button btn-link">
+                        <i class="material-icons">settings</i>
+                    </button>
+                </div>
+
+                <span class="navbar-text">Distribute</span>
+                <div class="button_row">
+                    <a id="port_button" class="btn feature-button">Port</a>
+                    <button id="port_params_button" class="params-button btn-link">
+                        <i class="material-icons">settings</i>
+                    </button>
+                </div>
+                <div class="button_row">
+                    <a id="via_button" class="btn feature-button">Via</a>
+                    <button id="via_params_button" class="params-button btn-link">
+                        <i class="material-icons">settings</i>
+                    </button>
+                </div>
+                <div class="button_row" hidden="true">
+                    <a id="mixer_button" class="btn feature-button">Mixer</a>
+                    <button id="mixer_params_button" class="params-button btn-link">
+                        <i class="material-icons">settings</i>
+                    </button>
+                </div>
+                <div class="button_row">
+                    <a id="tree_button" class="btn feature-button">Tree</a>
+                    <button id="tree_params_button" class="params-button btn-link">
+                        <i class="material-icons">settings</i>
+                    </button>
+                </div>
+                <div class="button_row">
+                    <a id="mux_button" class="btn feature-button">Mux</a>
+                    <button id="mux_params_button" class="params-button btn-link">
+                        <i class="material-icons">settings</i>
+                    </button>
+                </div>
+                <div class="button_row">
+                    <a id="transposer_button" class="btn feature-button">Transposer</a>
+                    <button id="transposer_params_button" class="params-button btn-link">
+                        <i class="material-icons">settings</i>
+                    </button>
+                </div>
+
+                <div style="visibility:hidden">
+                    <span class="mdl-layout-title">QoL Operations</span>
+                    <a id="revertdefaults_button" class="btn view-button">Flow</a>
+                    <a id="button_2D" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised view-button">2D</a>
+                </div>
+                <span class="navbar-text">Select Layer</span>
+                <a id="flow_button" class="btn view-button">Flow</a>
+                <a id="control_button" class="btn view-button">Control</a>
+                <a id="cells_button" class="btn view-button">Cells</a>
+
+                <br/>
+
+                <span class="navbar-text">Save</span>
+                <br/>
+                <a id="interchange_button" class="btn btn-link view-button">JSON (.json)</a>
+                <a id="svg_button" class="btn btn-link view-button">Vector Art (.svg)</a>
+
+                <a id="infobutton" href="info.html" class="popdown btn btn-link" title="About">About/Help</a>
+                <br/>
+                <br />
+
+            </div>
 
             <!--</div>-->
         </div>
