@@ -5,9 +5,7 @@ var Registry = require("../core/registry");
 // var Device = require("../core/device");
 import Device from '../core/device';
 var ChannelTool = require("./tools/channelTool");
-
 var PanTool = require("./tools/panTool");
-var PanAndZoom = require("./PanAndZoom");
 var SelectTool = require("./tools/selectTool");
 var InsertTextTool = require("./tools/insertTextTool");
 var SimpleQueue = require("../utils/SimpleQueue");
@@ -27,7 +25,7 @@ import MoveTool from "./tools/moveTool";
 import ComponentPositionTool from "./tools/componentPositionTool";
 import MultilayerPositionTool from "./tools/multilayerPositionTool";
 import CellPositionTool from "./tools/cellPositionTool";
-// import ValveInsertionTool from "./tools/valveInsertionTool";
+import ValveInsertionTool from "./tools/valveInsertionTool";
 import PositionTool from "./tools/positionTool";
 import ConnectionTool from "./tools/connectionTool";
 
@@ -650,14 +648,14 @@ export default class ViewManager {
         this.tools["MouseSelectTool"] = new MouseSelectTool();
         this.tools["InsertTextTool"] = new InsertTextTool();
         this.tools["Chamber"] = new ComponentPositionTool("Chamber", "Basic");
-        this.tools["Valve"] = new ComponentPositionTool("Valve", "Basic");
+        this.tools["Valve"] = new ValveInsertionTool("Valve", "Basic");
         this.tools["Channel"] = new ChannelTool("Channel", "Basic");
         this.tools["Connection"] = new ConnectionTool("Connection", "Basic");
         this.tools["RoundedChannel"] = new ChannelTool("RoundedChannel", "Basic");
         this.tools["Node"] = new ComponentPositionTool("Node", "Basic");
-        this.tools["CircleValve"] = new ComponentPositionTool("CircleValve", "Basic");
+        this.tools["CircleValve"] = new ValveInsertionTool("CircleValve", "Basic");
         this.tools["RectValve"] = new ComponentPositionTool("RectValve", "Basic");
-        this.tools["Valve3D"] = new MultilayerPositionTool("Valve3D", "Basic");
+        this.tools["Valve3D"] = new ValveInsertionTool("Valve3D", "Basic", true);
         this.tools["Port"] = new ComponentPositionTool("Port", "Basic");
         this.tools["Via"] = new PositionTool("Via", "Basic");
         this.tools["DiamondReactionChamber"] = new ComponentPositionTool("DiamondReactionChamber", "Basic");

@@ -1,8 +1,8 @@
+import MouseTool from "./mouseTool";
+
 var Registry = require("../../core/registry");
-var MouseTool = require("./mouseTool");
 var SimpleQueue = require("../../utils/simpleQueue");
 import Feature from "../../core/feature";
-var PageSetup = require("../pageSetup");
 
 export default class ConnectionTool extends MouseTool {
     constructor(typeString, setString) {
