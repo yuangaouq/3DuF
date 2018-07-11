@@ -199,20 +199,6 @@ export default class Connection {
     }
 
 
-    updateComponetPosition(center){
-        let xpos = center[0];
-        let ypos = center[1];
-
-        for(let i in this.__features){
-            let featureidtochange = this.__features[i];
-
-            let feature = Registry.currentDevice.getFeatureByID(featureidtochange);
-            feature.updateParameter('position', center);
-        }
-    }
-
-
-
     /**
      * This method is used to import the component from Interchange V1 JSON
      * @param json

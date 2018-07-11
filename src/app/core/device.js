@@ -17,28 +17,71 @@ export default class Device {
         this.params = new Params(values, Device.getUniqueParameters(), Device.getHeritableParameters());
         this.name = StringValue(name);
         this.__components = [];
+        this.__connections = [];
+        this.__valveMap = new Map();
     }
 
+    /**
+     * Adds a connection to the device
+     * @param connection
+     */
+    addConnection(connection){
+        this.__connections.push(connection);
+    }
+
+    /**
+     * Removes a connection from the device
+     * @param connection
+     */
+    removeConnection(connection){
+        let i = this.__connections.indexOf(connection);
+        if(i != -1) {
+            this.__connections.splice(i, 1);
+        }
+
+    }
+
+    /**
+     * Adds a component to the device
+     * @param component
+     */
     addComponent(component){
         this.__components.push(component);
     }
 
+    /**
+     * Removes a component from the device
+     * @param component
+     */
     removeComponent(component){
-        var i = this.__components.indexOf(component);
+        let i = this.__components.indexOf(component);
         if(i != -1) {
             this.__components.splice(i, 1);
         }
     }
 
+    /**
+     * Returns the list of components from the device
+     * @return {Array}
+     */
     getComponents(){
         return this.__components;
     }
 
+    /**
+     * Sets the name of the device
+     * @param name
+     */
     setName(name){
         this.name = StringValue(name);
         this.updateView();
     }
 
+    /**
+     * Updates the parameter
+     * @param key
+     * @param value
+     */
     updateParameter(key, value){
         this.params.updateParameter(key, value);
         this.updateView();
@@ -51,6 +94,11 @@ export default class Device {
         });
     }
 
+    /**
+     * Returns the ayer that contains the feature with the given feature ID
+     * @param featureID
+     * @return Layer
+     */
     getLayerFromFeatureID(featureID){
         for (let i = 0; i < this.layers.length; i ++){
             let layer = this.layers[i];
@@ -67,6 +115,11 @@ export default class Device {
         throw new Error("FeatureID " + featureID + " not found in any layer.");
     }
 
+    /**
+     * Checks if feature with given feature id is part of the device
+     * @param featureID
+     * @return {boolean}
+     */
     containsFeatureID(featureID){
         for (let i = 0; i < this.layers.length; i ++){
             if (this.layers[i].containsFeatureID(featureID)) return true;
@@ -74,6 +127,10 @@ export default class Device {
         return false;
     }
 
+    /**
+     * Returns a list of all the features in the device
+     * @return {Array}
+     */
     getAllFeaturesFromDevice() {
         let features = [];
         for (let i in this.layers) {
@@ -86,6 +143,12 @@ export default class Device {
         }
         return features;
     }
+
+    /**
+     * Returns the feature with the given feature id
+     * @param featureID
+     * @return Feature
+     */
     getFeatureByID(featureID){
         let layer =  this.getLayerFromFeatureID(featureID);
         return layer.getFeature(featureID);
@@ -98,7 +161,8 @@ export default class Device {
         //this.sortLayers();
         if (Registry.viewManager) Registry.viewManager.addLayer(this.layers.indexOf(layer));
     }
-    
+
+
     removeFeature(feature){
         this.removeFeatureByID(feature.getID());
     }
@@ -228,18 +292,34 @@ export default class Device {
         return this.__renderLayers2D();
     }
 
+    /**
+     * Set the X-Span Value
+     * @param value
+     */
     setXSpan(value){
         this.params.updateParameter("width", value);
     }
 
+    /**
+     * Set the Y-Span Value
+     * @param value
+     */
     setYSpan(value){
         this.params.updateParameter("height", value);
     }
 
+    /**
+     * Returns the X-Span Value
+     * @return {*}
+     */
     getXSpan(){
         return this.params.getValue("width");
     }
 
+    /**
+     * Returns the Y-Span Value
+     * @return {*}
+     */
     getYSpan(){
         return this.params.getValue("height");
     }
@@ -263,6 +343,10 @@ export default class Device {
         return [flowlayer, controllayer, cell];
     }
 
+    /**
+     * Deletes the layer defined by the index
+     * @param index
+     */
     deleteLayer(index){
 
         if(index != -1) {
@@ -271,6 +355,11 @@ export default class Device {
 
     }
 
+    /**
+     * Returns the component identified by the id
+     * @param id
+     * @return Component
+     */
     getComponentForFeatureID(id){
         for(let i in this.__components){
             let component = this.__components[i];
@@ -284,6 +373,32 @@ export default class Device {
         }
 
         return null;
+    }
+
+    /**
+     * Returns the connection identified by the id
+     * @param id
+     * @return Connection
+     */
+    getConnectionForFeatureID(id){
+        for(let i in this.__connections){
+            let connection = this.__connections[i];
+            //go through each component's features
+            for(let j in connection.features){
+                let feature = connection.features[j];
+                if(feature === id){
+                    return connection;
+                }
+            }
+        }
+
+        return null;
+
+    }
+
+    insertValve(valve, connection){
+        this.__valveMap.set(valve.getID(), connection.getID());
+        console.log(this.__valveMap);
     }
 
 }
