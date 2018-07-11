@@ -1159,9 +1159,39 @@ function generateMuxControlTwig(treepath, px, py,cw, ctlcw, stagelength , newspa
 }
 
 var ValveTarget = function(params){
-    let ret = Valve(params);
-    ret.fillColor.alpha = 0.5;
-    return ret;
+    // let ret = Valve(params);
+    // ret.fillColor.alpha = 0.5;
+    // return ret;
+
+    let position = params["position"];
+    let px = position[0];
+    let py = position[1];
+    let l = params["length"];
+    let w = params["width"];
+    let color = params["color"];
+    let rotation = params["rotation"];
+    console.log(params, l,w, rotation, color);
+    let startX = px - w/2;
+    let startY = py - l/2;
+    let endX = px + w/2;
+    let endY = py + l/2;
+    let startPoint = new paper.Point(startX, startY);
+    let endPoint = new paper.Point(endX, endY);
+    let rec = paper.Path.Rectangle({
+        from: startPoint,
+        to: endPoint,
+        radius: 0,
+        fillColor: color,
+        strokeWidth: 0
+    });
+
+    rec.fillColor.alpha = 0.5;
+    // if(orientation == "V"){
+    //     rotation = 90;
+    // }
+
+    return rec.rotate(rotation, px, py);
+
 };
 
 
