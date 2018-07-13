@@ -54,6 +54,14 @@ export default class Device {
      * @param component
      */
     removeComponent(component){
+        //Remove the component from the map
+        let componentid = component.getID();
+
+        //Check if the valve map has the component
+        if(this.__valveMap.has(componentid)){
+            this.__valveMap.delete(componentid);
+        }
+
         let i = this.__components.indexOf(component);
         if(i != -1) {
             this.__components.splice(i, 1);
@@ -396,9 +404,45 @@ export default class Device {
 
     }
 
+    /**
+     * Insert a connection between a valve component and the connection component
+     * @param valve
+     * @param connection
+     */
     insertValve(valve, connection){
         this.__valveMap.set(valve.getID(), connection.getID());
-        console.log(this.__valveMap);
     }
 
+    getConnections(){
+        return this.__connections;
+    }
+
+    //Returns a list of valves mapped onto the connection
+    getValvesForConnection(connection){
+        let connectionid = connection.getID();
+        let ret = [];
+        for (let [key, value] of this.__valveMap) {
+            // let  = pair;
+            if(connectionid == value){
+                ret.push(this.getComponentByID(key));
+            }
+        }
+
+        return ret;
+    }
+
+    /**
+     * Returns component that identified by the given key
+     * @param key
+     * @return Component
+     */
+    getComponentByID(key) {
+        for(let i in this.__components){
+
+            let component = this.__components[i];
+            if(component.getID() == key){
+                return component;
+            }
+        }
+    }
 }

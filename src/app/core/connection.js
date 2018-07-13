@@ -198,6 +198,10 @@ export default class Connection {
         }
     }
 
+    getWaypoints(){
+        return this.__params["wayPoints"].getValue()
+    }
+
 
     /**
      * This method is used to import the component from Interchange V1 JSON

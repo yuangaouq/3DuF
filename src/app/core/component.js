@@ -211,7 +211,9 @@ class Component {
         }
     }
 
-
+    getControlFeature(){
+        return this.__features[this.__features.length - 1];
+    }
 
     /**
      * This method is used to import the component from Interchange V1 JSON

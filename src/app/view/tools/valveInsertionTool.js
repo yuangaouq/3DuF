@@ -114,9 +114,7 @@ export default class ValveInsertionTool extends MultilayerPositionTool{
         let hit = Registry.viewManager.view.hitFeature(target, false);
         //TODO: check if the hit feature belongs to a connection
         if(hit){
-            console.log("hit", hit.featureID);
             let connection = Registry.currentDevice.getConnectionForFeatureID(hit.featureID);
-            console.log("connection found:", connection);
             return connection;
         }
 
@@ -145,8 +143,8 @@ export default class ValveInsertionTool extends MultilayerPositionTool{
             component = this.createNewFeature(point, angle);
         }
 
-        let componentrender = Registry.currentDevice.getFeatureByID(component.features[0]);
-        Registry.currentDevice.insertValve(componentrender, connection);
+        Registry.currentDevice.insertValve(component, connection);
+        Registry.viewManager.updatesConnectionRender(connection);
     }
 
     /**
