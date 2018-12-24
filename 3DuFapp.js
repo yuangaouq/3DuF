@@ -75723,8 +75723,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var Registry = require("./core/registry");
 
-var PageSetup = require("./view/pageSetup");
-
 var Colors = require("./view/colors");
 
 var Examples = require("./examples/jsonExamples");
@@ -75750,12 +75748,6 @@ function getQueryVariable(variable) {
 }
 
 window.onload = function () {
-  var isChrome = !!window.chrome && !!window.chrome.webstore;
-
-  if (!isChrome) {
-    alert("Warning ! Unsupported browser detected. 3DuF has been developed and tested only in Chrome. " + "The tool may not work correctly on this browser");
-  }
-
   var view = new _paperView.default(document.getElementById("c"));
   viewManager = new _viewManager.default(view);
   grid = new _adaptiveGrid.default();
@@ -75767,8 +75759,6 @@ window.onload = function () {
   window.dev = Registry.currentDevice;
   window.Registry = Registry;
   window.view = Registry.viewManager.view; // Registry.threeRenderer = new ThreeDeviceRenderer(document.getElementById("renderContainer"));
-
-  PageSetup.setupAppPage();
 
   if (false != getQueryVariable("file")) {
     //Download the json
@@ -75785,9 +75775,7 @@ window.onload = function () {
       Registry.currentDevice.updateView();
       window.dev = Registry.currentDevice;
       window.Registry = Registry;
-      window.view = Registry.viewManager.view;
-      Registry.threeRenderer = new ThreeDeviceRenderer(document.getElementById("renderContainer"));
-      PageSetup.setupAppPage();
+      window.view = Registry.viewManager.view; // Registry.threeRenderer = new ThreeDeviceRenderer(document.getElementById("renderContainer"));
     }).catch(function (err) {
       // This is where you run code if the server returns any errors
       alert("Error fetching the json");
@@ -75799,7 +75787,7 @@ window.onload = function () {
   Registry.viewManager.generateBorder();
 };
 
-},{"./core/registry":264,"./examples/jsonExamples":266,"./view/colors":283,"./view/grid/adaptiveGrid":286,"./view/pageSetup":288,"./view/paperView":290,"./view/viewManager":328,"paper":194}],245:[function(require,module,exports){
+},{"./core/registry":264,"./examples/jsonExamples":266,"./view/colors":283,"./view/grid/adaptiveGrid":286,"./view/paperView":289,"./view/viewManager":329,"paper":194}],245:[function(require,module,exports){
 "use strict";
 
 var _params = _interopRequireDefault(require("./params"));
@@ -76196,7 +76184,7 @@ function () {
 
 module.exports = Component;
 
-},{"../view/render2D/featureRenderer2D":294,"./parameter":254,"./params":263,"./registry":264}],246:[function(require,module,exports){
+},{"../view/render2D/featureRenderer2D":293,"./parameter":254,"./params":263,"./registry":264}],246:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -79129,7 +79117,7 @@ function (_Feature) {
       //TODO: We need to figure out what to do and what the final feature format will be
       var output = {};
       output.id = this.__id;
-      output.name = this.__name.toJSON();
+      output.name = this.__name;
       output.macro = this.__type;
       output.set = this.__set;
       output.params = this.__params.toJSON();
@@ -82385,7 +82373,7 @@ module.exports.getTool = getTool;
 module.exports.getRender2D = getRender2D;
 module.exports.getRender3D = getRender3D;
 
-},{"../core/customComponent":248,"../core/registry":264,"../view/render2D/dxfSolidObjectRenderer2D":293,"./basic":268,"./featureSet":272}],274:[function(require,module,exports){
+},{"../core/customComponent":248,"../core/registry":264,"../view/render2D/dxfSolidObjectRenderer2D":292,"./basic":268,"./featureSet":272}],274:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -84234,188 +84222,7 @@ function () {
 
 exports.default = MouseAndKeyboardHandler;
 
-},{"./tools/panTool":309,"paper":194}],288:[function(require,module,exports){
-"use strict";
-
-var _htmlUtils = require("../utils/htmlUtils");
-
-var _paper = _interopRequireDefault(require("paper"));
-
-var _manufacturingLayer = _interopRequireDefault(require("../manufacturing/manufacturingLayer"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var HTMLUtils = require("../utils/htmlUtils");
-
-var Registry = require("../core/registry");
-
-var Colors = require("./colors");
-
-var JSZip = require("jszip");
-
-var InsertTextTool = require("./tools/insertTextTool");
-
-var activeButton = null;
-var activeLayer = null;
-var revertdefaultsButton = document.getElementById("revertdefaults_button");
-var jsonButton = document.getElementById("json_button");
-var interchangeV1Button = document.getElementById("interchange_button");
-var svgButton = document.getElementById("svg_button"); //let stlButton = document.getElementById("stl_button");
-
-var button2D = document.getElementById("button_2D"); //let button3D = document.getElementById("button_3D");
-// let cellsButton = document.getElementById("cells_button");
-
-var inactiveBackground = Colors.GREY_200;
-var inactiveText = Colors.BLACK;
-var activeText = Colors.WHITE;
-var canvas = document.getElementById("c");
-var canvasBlock = document.getElementById("canvas_block");
-var renderBlock = document.getElementById("renderContainer");
-var renderer;
-var view;
-var threeD = false;
-var acceptTextButton = document.getElementById("accept_text_button"); // let layerButtons = {
-//     "0": flowButton,
-//     "1": controlButton,
-//     "2": cellsButton
-// };
-
-var layerIndices = {
-  "0": 0,
-  "1": 1,
-  "2": 2
-};
-var zipper = new JSZip();
-
-function drop(ev) {
-  ev.preventDefault();
-  var data = ev.dataTransfer.getData("text");
-  ev.target.appendChild(document.getElementById(data));
-}
-
-function switchTo3D() {
-  if (!threeD) {
-    threeD = true;
-    (0, _htmlUtils.setButtonColor)(button3D, Colors.getDefaultLayerColor(Registry.currentLayer), activeText);
-    (0, _htmlUtils.setButtonColor)(button2D, inactiveBackground, inactiveText);
-    renderer.loadJSON(Registry.currentDevice.toJSON());
-    var cameraCenter = view.getViewCenterInMillimeters();
-    var height = Registry.currentDevice.params.getValue("height") / 1000;
-    var pixels = view.getDeviceHeightInPixels();
-    renderer.setupCamera(cameraCenter[0], cameraCenter[1], height, pixels, _paper.default.view.zoom);
-    renderer.showMockup();
-    HTMLUtils.removeClass(renderBlock, "hidden-block");
-    HTMLUtils.addClass(canvasBlock, "hidden-block");
-    HTMLUtils.addClass(renderBlock, "shown-block");
-    HTMLUtils.removeClass(canvasBlock, "shown-block");
-  }
-} //TODO: transition backwards is super hacky. Fix it!
-
-
-function setupAppPage() {
-  view = Registry.viewManager.view;
-  renderer = Registry.threeRenderer; //Register all the button clicks here
-
-  acceptTextButton.onclick = function () {
-    Registry.viewManager.activateTool("InsertTextTool");
-    Registry.text = document.getElementById("inserttext_textinput").value;
-    var textLabelDialog = document.getElementById('insert_text_dialog');
-    textLabelDialog.close();
-  }; // revertdefaultsButton.onclick = function() {
-  //     Registry.viewManager.revertFeaturesToDefaults(Registry.viewManager.view.getSelectedFeatures());
-  //
-  // };
-
-
-  interchangeV1Button.onclick = function () {
-    var json = new Blob([JSON.stringify(Registry.currentDevice.toInterchangeV1())], {
-      type: "application/json"
-    });
-    saveAs(json, Registry.currentDevice.getName() + ".json");
-  };
-  /*
-      stlButton.onclick = function() {
-          let json = Registry.currentDevice.toJSON();
-          let stls = renderer.getSTL(json);
-          let blobs = [];
-          let zipper = new JSZip();
-          for (let i = 0; i < stls.length; i++) {
-              let name = "" + i + "_" + json.name + "_" + json.layers[i].name + ".stl";
-              zipper.file(name, stls[i]);
-          }
-          let content = zipper.generate({
-              type: "blob"
-          });
-          saveAs(content, json.name + "_layers.zip");
-      }
-  */
-
-
-  svgButton.onclick = function () {
-    var svgs = Registry.viewManager.layersToSVGStrings();
-
-    for (var i = 0; i < svgs.length; i++) {
-      svgs[i] = _manufacturingLayer.default.generateSVGTextPrepend(Registry.currentDevice.getXSpan(), Registry.currentDevice.getYSpan()) + svgs[i] + _manufacturingLayer.default.generateSVGTextAppend();
-    } //let svg = paper.project.exportSVG({asString: true});
-
-
-    var blobs = [];
-    var success = 0;
-    var zipper = new JSZip();
-
-    for (var _i = 0; _i < svgs.length; _i++) {
-      if (svgs[_i].slice(0, 4) == "<svg") {
-        zipper.file("Device_layer_" + _i + ".svg", svgs[_i]);
-        success++;
-      }
-    }
-
-    if (success == 0) throw new Error("Unable to generate any valid SVGs. Do all layers have at least one non-channel item in them?");else {
-      var content = zipper.generate({
-        type: "blob"
-      });
-      saveAs(content, "device_layers.zip");
-    }
-  }; // button2D.onclick = function() {
-  //   /*  killParamsWindow();
-  //     switchTo2D();*/
-  // };
-  //  button3D.onclick = function() {
-
-  /* killParamsWindow();
-   switchTo3D();*/
-  //}
-
-
-  function setupDragAndDropLoad(selector) {
-    var dnd = new HTMLUtils.DnDFileController(selector, function (files) {
-      var f = files[0];
-      var reader = new FileReader();
-
-      reader.onloadend = function (e) {
-        var result = JSON.parse(this.result);
-        Registry.viewManager.loadDeviceFromJSON(result);
-        Registry.viewManager.switchTo2D();
-      };
-
-      try {
-        reader.readAsText(f);
-      } catch (err) {
-        console.log("unable to load JSON: " + f);
-      }
-    });
-  }
-
-  setupDragAndDropLoad("#c");
-  setupDragAndDropLoad("#renderContainer"); //setActiveButton("Channel");
-  //setActiveLayer("0");
-
-  Registry.viewManager.switchTo2D();
-}
-
-module.exports.setupAppPage = setupAppPage;
-
-},{"../core/registry":264,"../manufacturing/manufacturingLayer":278,"../utils/htmlUtils":279,"./colors":283,"./tools/insertTextTool":304,"jszip":155,"paper":194}],289:[function(require,module,exports){
+},{"./tools/panTool":308,"paper":194}],288:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -84479,7 +84286,7 @@ function () {
 
 exports.default = PanAndZoom;
 
-},{}],290:[function(require,module,exports){
+},{}],289:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -85182,7 +84989,7 @@ function () {
 
 exports.default = PaperView;
 
-},{"../core/edgeFeature":251,"../core/registry":264,"../core/textFeature":265,"../manufacturing/manufacturingLayer":278,"./colors":283,"./panAndZoom":289,"./render2D/deviceRenderer2D":291,"./render2D/dxfObjectRenderer2D":292,"./render2D/dxfSolidObjectRenderer2D":293,"./render2D/featureRenderer2D":294,"./render2D/gridRenderer":295,"paper":194}],291:[function(require,module,exports){
+},{"../core/edgeFeature":251,"../core/registry":264,"../core/textFeature":265,"../manufacturing/manufacturingLayer":278,"./colors":283,"./panAndZoom":288,"./render2D/deviceRenderer2D":290,"./render2D/dxfObjectRenderer2D":291,"./render2D/dxfSolidObjectRenderer2D":292,"./render2D/featureRenderer2D":293,"./render2D/gridRenderer":294,"paper":194}],290:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -85256,7 +85063,7 @@ function () {
 
 exports.default = DeviceRenderer;
 
-},{"../colors":283,"paper":194}],292:[function(require,module,exports){
+},{"../colors":283,"paper":194}],291:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -85662,7 +85469,7 @@ function drawPoint(entity, data) {
   scene.add(point);
 }
 
-},{"../../core/registry":264,"../../featureSets":273,"../colors":283,"./primitiveSets2D":297,"paper":194}],293:[function(require,module,exports){
+},{"../../core/registry":264,"../../featureSets":273,"../colors":283,"./primitiveSets2D":296,"paper":194}],292:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -86262,7 +86069,7 @@ function drawPoint(entity, data) {
   scene.add(point);
 }
 
-},{"../../geometry/geometryGraph":275,"../../utils/linkedList":280,"../colors":283,"paper":194}],294:[function(require,module,exports){
+},{"../../geometry/geometryGraph":275,"../../utils/linkedList":280,"../colors":283,"paper":194}],293:[function(require,module,exports){
 "use strict";
 
 var DXFSolidObjectRenderer2D = _interopRequireWildcard(require("./dxfSolidObjectRenderer2D"));
@@ -86417,7 +86224,7 @@ module.exports.renderTarget = renderTarget;
 module.exports.renderTextTarget = renderTextTarget;
 module.exports.renderText = renderText;
 
-},{"../../core/feature":252,"../../core/registry":264,"../../featureSets":273,"../../view/render2D/dxfObjectRenderer2D":292,"../colors":283,"./dxfSolidObjectRenderer2D":293,"./primitiveSets2D":297,"paper":194}],295:[function(require,module,exports){
+},{"../../core/feature":252,"../../core/registry":264,"../../featureSets":273,"../../view/render2D/dxfObjectRenderer2D":291,"../colors":283,"./dxfSolidObjectRenderer2D":292,"./primitiveSets2D":296,"paper":194}],294:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -86542,7 +86349,7 @@ function () {
 
 exports.default = GridRenderer;
 
-},{"paper":194}],296:[function(require,module,exports){
+},{"paper":194}],295:[function(require,module,exports){
 "use strict";
 
 var _paper = _interopRequireDefault(require("paper"));
@@ -89093,12 +88900,12 @@ module.exports.AlignmentMarks = AlignmentMarks;
 module.exports.AlignmentMarks_control = AlignmentMarks_control;
 module.exports.AlignmentMarksTarget = AlignmentMarksTarget;
 
-},{"paper":194}],297:[function(require,module,exports){
+},{"paper":194}],296:[function(require,module,exports){
 "use strict";
 
 module.exports.Basic2D = require("./basic2D");
 
-},{"./basic2D":296}],298:[function(require,module,exports){
+},{"./basic2D":295}],297:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -89191,7 +88998,7 @@ function (_PositionTool) {
 
 exports.default = CellPositionTool;
 
-},{"../../core/feature":252,"../../core/registry":264,"./positionTool":310}],299:[function(require,module,exports){
+},{"../../core/feature":252,"../../core/registry":264,"./positionTool":309}],298:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -89373,7 +89180,7 @@ function (_MouseTool) {
 
 exports.default = ChannelTool;
 
-},{"../../core/feature":252,"../../core/registry":264,"../../utils/simpleQueue":282,"./mouseTool":306,"paper":194}],300:[function(require,module,exports){
+},{"../../core/feature":252,"../../core/registry":264,"../../utils/simpleQueue":282,"./mouseTool":305,"paper":194}],299:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -89454,7 +89261,7 @@ function (_PositionTool) {
 
 exports.default = ComponentPositionTool;
 
-},{"../../core/feature":252,"../../core/registry":264,"./positionTool":310}],301:[function(require,module,exports){
+},{"../../core/feature":252,"../../core/registry":264,"./positionTool":309}],300:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -89962,7 +89769,7 @@ function (_MouseTool) {
 
 exports.default = ConnectionTool;
 
-},{"../../core/connection":246,"../../core/connectionTarget":247,"../../core/feature":252,"../../core/params":263,"../../core/registry":264,"../../utils/simpleQueue":282,"./mouseTool":306,"paper":194}],302:[function(require,module,exports){
+},{"../../core/connection":246,"../../core/connectionTarget":247,"../../core/feature":252,"../../core/params":263,"../../core/registry":264,"../../utils/simpleQueue":282,"./mouseTool":305,"paper":194}],301:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -90047,7 +89854,7 @@ function (_PositionTool) {
 
 exports.default = CustomComponentPositionTool;
 
-},{"../../core/feature":252,"../../core/registry":264,"./positionTool":310}],303:[function(require,module,exports){
+},{"../../core/feature":252,"../../core/registry":264,"./positionTool":309}],302:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -90354,7 +90161,7 @@ function (_MouseTool) {
 
 exports.default = GenerateArrayTool;
 
-},{"../../core/registry":264,"../../utils/simpleQueue":282,"../ui/generateArrayWindow":318,"./mouseTool":306}],304:[function(require,module,exports){
+},{"../../core/registry":264,"../../utils/simpleQueue":282,"../ui/generateArrayWindow":318,"./mouseTool":305}],303:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -90369,6 +90176,10 @@ var _textFeature = _interopRequireDefault(require("../../core/textFeature"));
 var _simpleQueue = _interopRequireDefault(require("../../utils/simpleQueue"));
 
 var _paper = _interopRequireDefault(require("paper"));
+
+var _positionTool = _interopRequireDefault(require("./positionTool"));
+
+var _params = _interopRequireDefault(require("../../core/params"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -90392,12 +90203,6 @@ function _assertThisInitialized(self) { if (self === void 0) { throw new Referen
 
 var Registry = require("../../core/registry");
 
-var PageSetup = require("../pageSetup");
-
-var PositionTool = require("./positionTool");
-
-var Params = require("../../core/params");
-
 var InsertTextTool =
 /*#__PURE__*/
 function (_MouseTool) {
@@ -90410,7 +90215,7 @@ function (_MouseTool) {
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(InsertTextTool).call(this));
     _this.typeString = "TEXT";
-    _this.setString = "STndard";
+    _this.setString = "Standard";
     _this.currentFeatureID = null;
 
     var ref = _assertThisInitialized(_assertThisInitialized(_this));
@@ -90442,8 +90247,8 @@ function (_MouseTool) {
   _createClass(InsertTextTool, [{
     key: "createNewFeature",
     value: function createNewFeature(point) {
-      var newFeature = _textFeature.default.makeFeature(Registry.text, this.typeString, this.setString, new Params({
-        "position": PositionTool.getTarget(point),
+      var newFeature = _textFeature.default.makeFeature(Registry.text, this.typeString, this.setString, new _params.default({
+        "position": _positionTool.default.getTarget(point),
         "height": 200
       }, {
         "position": "Point"
@@ -90459,7 +90264,8 @@ function (_MouseTool) {
   }, {
     key: "showTarget",
     value: function showTarget() {
-      var target = PositionTool.getTarget(this.lastPoint);
+      var target = _positionTool.default.getTarget(this.lastPoint);
+
       Registry.viewManager.updateTarget(this.typeString, this.setString, target);
     }
   }]);
@@ -90469,7 +90275,7 @@ function (_MouseTool) {
 
 exports.default = InsertTextTool;
 
-},{"../../core/params":263,"../../core/registry":264,"../../core/textFeature":265,"../../utils/simpleQueue":282,"../pageSetup":288,"./mouseTool":306,"./positionTool":310,"paper":194}],305:[function(require,module,exports){
+},{"../../core/params":263,"../../core/registry":264,"../../core/textFeature":265,"../../utils/simpleQueue":282,"./mouseTool":305,"./positionTool":309,"paper":194}],304:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -90814,7 +90620,7 @@ function (_MouseTool) {
 
 exports.default = MouseSelectTool;
 
-},{"../../core/registry":264,"../../utils/simpleQueue":282,"../ui/rightClickMenu":325,"./mouseTool":306,"paper":194}],306:[function(require,module,exports){
+},{"../../core/registry":264,"../../utils/simpleQueue":282,"../ui/rightClickMenu":326,"./mouseTool":305,"paper":194}],305:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -90866,7 +90672,7 @@ function () {
 
 exports.default = MouseTool;
 
-},{"../../core/registry":264}],307:[function(require,module,exports){
+},{"../../core/registry":264}],306:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -91193,7 +90999,7 @@ function (_MouseTool) {
 
 exports.default = MoveTool;
 
-},{"../../core/registry":264,"../ui/moveToolBar":322,"./mouseTool":306}],308:[function(require,module,exports){
+},{"../../core/registry":264,"../ui/moveToolBar":323,"./mouseTool":305}],307:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -91286,7 +91092,7 @@ function (_PositionTool) {
 
 exports.default = MultilayerPositionTool;
 
-},{"../../core/feature":252,"../../core/registry":264,"./positionTool":310}],309:[function(require,module,exports){
+},{"../../core/feature":252,"../../core/registry":264,"./positionTool":309}],308:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -91401,7 +91207,7 @@ function (_MouseTool) {
 
 exports.default = PanTool;
 
-},{"../../core/registry":264,"../../utils/simpleQueue":282,"./mouseTool":306}],310:[function(require,module,exports){
+},{"../../core/registry":264,"../../utils/simpleQueue":282,"./mouseTool":305}],309:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -91549,7 +91355,7 @@ function (_MouseTool) {
 
 exports.default = PositionTool;
 
-},{"../../core/component":245,"../../core/feature":252,"../../core/params":263,"../../core/registry":264,"../../utils/simpleQueue":282,"./mouseTool":306,"paper":194}],311:[function(require,module,exports){
+},{"../../core/component":245,"../../core/feature":252,"../../core/params":263,"../../core/registry":264,"../../utils/simpleQueue":282,"./mouseTool":305,"paper":194}],310:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -91584,8 +91390,6 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
 var Registry = require("../../core/registry");
-
-var PageSetup = require("../pageSetup");
 
 var SelectTool =
 /*#__PURE__*/
@@ -91698,8 +91502,6 @@ function (_MouseTool) {
         if (target.selected) {
           var feat = Registry.currentDevice.getFeatureByID(target.featureID);
           Registry.viewManager.updateDefaultsFromFeature(feat);
-          var func = PageSetup.paramsWindowFunction(feat.getType(), feat.getSet(), true);
-          func(event);
         } else {
           this.deselectFeatures();
           this.selectFeature(target);
@@ -91844,7 +91646,7 @@ function (_MouseTool) {
 
 exports.default = SelectTool;
 
-},{"../../core/registry":264,"../../utils/simpleQueue":282,"../pageSetup":288,"./mouseTool":306,"paper":194}],312:[function(require,module,exports){
+},{"../../core/registry":264,"../../utils/simpleQueue":282,"./mouseTool":305,"paper":194}],311:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -92164,7 +91966,7 @@ function (_MultilayerPositionTo) {
 
 exports.default = ValveInsertionTool;
 
-},{"../../core/feature":252,"../../core/registry":264,"./mouseTool":306,"./multilayerPositionTool":308,"./positionTool":310,"paper":194}],313:[function(require,module,exports){
+},{"../../core/feature":252,"../../core/registry":264,"./mouseTool":305,"./multilayerPositionTool":307,"./positionTool":309,"paper":194}],312:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -92320,7 +92122,7 @@ function () {
 
 exports.default = BorderSettingsDialog;
 
-},{"../../core/registry":264,"../../utils/htmlUtils":279,"dxf-parser":89}],314:[function(require,module,exports){
+},{"../../core/registry":264,"../../utils/htmlUtils":279,"dxf-parser":89}],313:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -92471,7 +92273,7 @@ function () {
 
 exports.default = ChangeAllDialog;
 
-},{}],315:[function(require,module,exports){
+},{}],314:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -92482,6 +92284,10 @@ exports.default = void 0;
 var _htmlUtils = require("../../utils/htmlUtils");
 
 var _colors = require("../colors");
+
+var _insertTextDialog = _interopRequireDefault(require("./insertTextDialog"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -92558,6 +92364,7 @@ function () {
     this.__dropletgenParams = document.getElementById("dropletgen_params_button");
     this.__celltraplParams = document.getElementById("celltrapl_params_button");
     this.__alignmentMarksParams = document.getElementById("alignmentmarks_params_button");
+    this.__insertTextDialog = new _insertTextDialog.default();
     this.buttons = {
       "SelectButton": this.__selectToolButton,
       "InsertTextButton": this.__insertTextButton,
@@ -92855,7 +92662,7 @@ function () {
 
 exports.default = ComponentToolBar;
 
-},{"../../utils/htmlUtils":279,"../colors":283,"./parameterMenu":323}],316:[function(require,module,exports){
+},{"../../utils/htmlUtils":279,"../colors":283,"./insertTextDialog":320,"./parameterMenu":324}],315:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -93003,7 +92810,7 @@ function () {
 
 exports.default = CustomComponentToolBar;
 
-},{"../../core/registry":264,"../../utils/htmlUtils":279,"./componentToolBar":315}],317:[function(require,module,exports){
+},{"../../core/registry":264,"../../utils/htmlUtils":279,"./componentToolBar":314}],316:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -93095,7 +92902,104 @@ function () {
 
 exports.default = EditDeviceDialog;
 
-},{"../../core/registry":264}],318:[function(require,module,exports){
+},{"../../core/registry":264}],317:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _jszip = _interopRequireDefault(require("jszip"));
+
+var _manufacturingLayer = _interopRequireDefault(require("../../manufacturing/manufacturingLayer"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Registry = require("../../core/registry");
+
+var ExportPanel = function ExportPanel(viewManagerDelegate) {
+  _classCallCheck(this, ExportPanel);
+
+  this.__viewManagerDelegate = viewManagerDelegate; // this.__cncButton = document.getElementById("cnc_button");
+  // console.log("current device:", Registry.currentDevice);
+  // let cncGenerator = new CNCGenerator(Registry.currentDevice, this.__viewManagerDelegate);
+  // let registryref = Registry;
+  //
+  // let ref = this;
+  // this.__cncButton.addEventListener('click', function (event) {
+  //     console.log("Running generatePortLayers");
+  //     cncGenerator.setDevice(registryref.currentDevice);
+  //     cncGenerator.generatePortLayers();
+  //     cncGenerator.generateDepthLayers();
+  //     cncGenerator.generateEdgeLayers();
+  //
+  //     // console.log("SVG Data:", cncGenerator.getSVGOutputs());
+  //
+  //     ref.packageAndDownloadBundle(cncGenerator.getSVGOutputs());
+  //
+  //     cncGenerator.flushData();
+  // });
+
+  this.__svgButton = document.getElementById("svg_button");
+
+  this.__svgButton.onclick = function () {
+    var svgs = Registry.viewManager.layersToSVGStrings();
+
+    for (var i = 0; i < svgs.length; i++) {
+      svgs[i] = _manufacturingLayer.default.generateSVGTextPrepend(Registry.currentDevice.getXSpan(), Registry.currentDevice.getYSpan()) + svgs[i] + _manufacturingLayer.default.generateSVGTextAppend();
+    } //let svg = paper.project.exportSVG({asString: true});
+
+
+    var blobs = [];
+    var success = 0;
+    var zipper = new _jszip.default();
+
+    for (var _i = 0; _i < svgs.length; _i++) {
+      if (svgs[_i].slice(0, 4) == "<svg") {
+        zipper.file("Device_layer_" + _i + ".svg", svgs[_i]);
+        success++;
+      }
+    }
+
+    if (success == 0) throw new Error("Unable to generate any valid SVGs. Do all layers have at least one non-channel item in them?");else {
+      var content = zipper.generate({
+        type: "blob"
+      });
+      saveAs(content, "device_layers.zip");
+    }
+  };
+
+  this.__interchangeV1Button = document.getElementById("interchange_button");
+
+  this.__interchangeV1Button.onclick = function () {
+    var json = new Blob([JSON.stringify(Registry.currentDevice.toInterchangeV1())], {
+      type: "application/json"
+    });
+    saveAs(json, Registry.currentDevice.getName() + ".json");
+  };
+} // packageAndDownloadBundle(svgOutputs) {
+//     let zipper = new JSZip();
+//
+//     for(const key of svgOutputs.keys()){
+//         zipper.file(key+".svg", svgOutputs.get(key));
+//     }
+//
+//     let content = zipper.generate({
+//         type: "blob"
+//     });
+//
+//     saveAs(content, Registry.currentDevice.getName()+".zip");
+//
+//
+// }
+;
+
+exports.default = ExportPanel;
+
+},{"../../core/registry":264,"../../manufacturing/manufacturingLayer":278,"jszip":155}],318:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -93442,7 +93346,36 @@ function () {
 
 exports.default = ImportComponentDialog;
 
-},{"../../core/dxfObject":250,"../../utils/htmlUtils":279,"../render2D/dxfSolidObjectRenderer2D":293,"dxf-parser":89,"paper":194}],320:[function(require,module,exports){
+},{"../../core/dxfObject":250,"../../utils/htmlUtils":279,"../render2D/dxfSolidObjectRenderer2D":292,"dxf-parser":89,"paper":194}],320:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Registry = require('../../core/registry');
+
+var InsertTextDialog = function InsertTextDialog() {
+  _classCallCheck(this, InsertTextDialog);
+
+  this.__acceptTextButton = document.getElementById("accept_text_button");
+  this.__dialog = document.getElementById('insert_text_dialog');
+  var ref = this;
+
+  this.__acceptTextButton.onclick = function () {
+    Registry.viewManager.activateTool("InsertTextTool");
+    Registry.text = document.getElementById("inserttext_textinput").value;
+
+    ref.__dialog.close();
+  };
+};
+
+exports.default = InsertTextDialog;
+
+},{"../../core/registry":264}],321:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -93691,7 +93624,7 @@ function () {
 
 exports.default = LayerToolBar;
 
-},{"../../core/registry":264,"../../utils/htmlUtils":279,"../colors":283}],321:[function(require,module,exports){
+},{"../../core/registry":264,"../../utils/htmlUtils":279,"../colors":283}],322:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -93731,8 +93664,8 @@ function () {
       cncGenerator.setDevice(registryref.currentDevice);
       cncGenerator.generatePortLayers();
       cncGenerator.generateDepthLayers();
-      cncGenerator.generateEdgeLayers();
-      console.log("SVG Data:", cncGenerator.getSVGOutputs());
+      cncGenerator.generateEdgeLayers(); // console.log("SVG Data:", cncGenerator.getSVGOutputs());
+
       ref.packageAndDownloadBundle(cncGenerator.getSVGOutputs());
       cncGenerator.flushData();
     });
@@ -93778,7 +93711,7 @@ function () {
 
 exports.default = ManufacturingPanel;
 
-},{"../../core/registry":264,"../../manufacturing/cncGenerator":276,"jszip":155}],322:[function(require,module,exports){
+},{"../../core/registry":264,"../../manufacturing/cncGenerator":276,"jszip":155}],323:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -93933,7 +93866,7 @@ function () {
 
 exports.default = MoveToolBar;
 
-},{"../../utils/htmlUtils":279,"../../utils/numberUtils":281}],323:[function(require,module,exports){
+},{"../../utils/htmlUtils":279,"../../utils/numberUtils":281}],324:[function(require,module,exports){
 "use strict";
 
 var HTMLUtils = _interopRequireWildcard(require("../../utils/htmlUtils"));
@@ -94401,7 +94334,7 @@ module.exports.revertToDefaultParams = revertToDefaultParams;
 module.exports.createFeatureTable = createFeatureTable;
 module.exports.generateTableFunction = generateTableFunction;
 
-},{"../../core/feature":252,"../../core/parameters":257,"../../core/registry":264,"../../featureSets":273,"../../utils/htmlUtils":279}],324:[function(require,module,exports){
+},{"../../core/feature":252,"../../core/parameters":257,"../../core/registry":264,"../../featureSets":273,"../../utils/htmlUtils":279}],325:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -94526,7 +94459,7 @@ function () {
 
 exports.default = ResolutionToolBar;
 
-},{"../../core/registry":264,"wnumb":243}],325:[function(require,module,exports){
+},{"../../core/registry":264,"wnumb":243}],326:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -94730,7 +94663,7 @@ function () {
 
 exports.default = RightClickMenu;
 
-},{"../../utils/htmlUtils":279,"./parameterMenu":323}],326:[function(require,module,exports){
+},{"../../utils/htmlUtils":279,"./parameterMenu":324}],327:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -94766,7 +94699,7 @@ var RightPanel = function RightPanel(viewManagerDelegate) {
 
 exports.default = RightPanel;
 
-},{"./customComponentToolBar":316}],327:[function(require,module,exports){
+},{"./customComponentToolBar":315}],328:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -94863,7 +94796,7 @@ function () {
 
 exports.default = ZoomToolBar;
 
-},{"../../core/registry":264}],328:[function(require,module,exports){
+},{"../../core/registry":264}],329:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -94935,6 +94868,8 @@ var _customComponentPositionTool = _interopRequireDefault(require("./tools/custo
 
 var _customComponent = _interopRequireDefault(require("../core/customComponent"));
 
+var _exportPanel = _interopRequireDefault(require("./ui/exportPanel"));
+
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -94986,11 +94921,21 @@ function () {
     };
 
     this.manufacturingPanel = new _manufacturingPanel.default(this);
+    this.exportPanel = new _exportPanel.default(this);
     this.view.setMouseWheelFunction(func);
     this.minZoom = .0001;
     this.maxZoom = 5;
     this.setupTools();
-    this.activateTool("Channel");
+    this.activateTool("Channel"); //Removed from Page Setup
+
+    this.threeD = false;
+    this.renderer = Registry.threeRenderer;
+    this.__button2D = document.getElementById("button_2D");
+    this.__canvasBlock = document.getElementById("canvas_block");
+    this.__renderBlock = document.getElementById("renderContainer");
+    this.setupDragAndDropLoad("#c");
+    this.setupDragAndDropLoad("#renderContainer");
+    this.switchTo2D();
   }
   /**
    * Initiates the copy operation on the selected feature
@@ -95663,8 +95608,8 @@ function () {
     value: function switchTo2D() {
       if (this.threeD) {
         this.threeD = false;
-        var center = renderer.getCameraCenterInMicrometers();
-        var zoom = renderer.getZoom();
+        var center = this.renderer.getCameraCenterInMicrometers();
+        var zoom = this.renderer.getZoom();
         var newCenterX = center[0];
 
         if (newCenterX < 0) {
@@ -95681,15 +95626,59 @@ function () {
           newCenterY = Registry.currentDevice.params.getValue("height");
         }
 
-        HTMLUtils.setButtonColor(button2D, Colors.getDefaultLayerColor(Registry.currentLayer), activeText);
-        HTMLUtils.setButtonColor(button3D, inactiveBackground, inactiveText);
+        HTMLUtils.setButtonColor(this.__button2D, Colors.getDefaultLayerColor(Registry.currentLayer), activeText);
+        HTMLUtils.setButtonColor(this.__button3D, inactiveBackground, inactiveText);
         Registry.viewManager.setCenter(new _paper.default.Point(newCenterX, newCenterY));
         Registry.viewManager.setZoom(zoom);
-        HTMLUtils.addClass(renderBlock, "hidden-block");
-        HTMLUtils.removeClass(canvasBlock, "hidden-block");
-        HTMLUtils.removeClass(renderBlock, "shown-block");
-        HTMLUtils.addClass(canvasBlock, "shown-block");
+        HTMLUtils.addClass(this.__renderBlock, "hidden-block");
+        HTMLUtils.removeClass(this.__canvasBlock, "hidden-block");
+        HTMLUtils.removeClass(this.__renderBlock, "shown-block");
+        HTMLUtils.addClass(this.__canvasBlock, "shown-block");
       }
+    }
+  }, {
+    key: "switchTo3D",
+    value: function switchTo3D() {
+      if (!this.threeD) {
+        this.threeD = true;
+        (0, HTMLUtils.setButtonColor)(this.__button3D, Colors.getDefaultLayerColor(Registry.currentLayer), activeText);
+        (0, HTMLUtils.setButtonColor)(this.__button2D, inactiveBackground, inactiveText);
+        this.renderer.loadJSON(Registry.currentDevice.toJSON());
+        var cameraCenter = this.view.getViewCenterInMillimeters();
+        var height = Registry.currentDevice.params.getValue("height") / 1000;
+        var pixels = this.view.getDeviceHeightInPixels();
+        this.renderer.setupCamera(cameraCenter[0], cameraCenter[1], height, pixels, _paper.default.view.zoom);
+        this.renderer.showMockup();
+        HTMLUtils.removeClass(this.__renderBlock, "hidden-block");
+        HTMLUtils.addClass(this.__canvasBlock, "hidden-block");
+        HTMLUtils.addClass(this.__renderBlock, "shown-block");
+        HTMLUtils.removeClass(this.__canvasBlock, "shown-block");
+      }
+    }
+    /**
+     *
+     * @param selector
+     */
+
+  }, {
+    key: "setupDragAndDropLoad",
+    value: function setupDragAndDropLoad(selector) {
+      var dnd = new HTMLUtils.DnDFileController(selector, function (files) {
+        var f = files[0];
+        var reader = new FileReader();
+
+        reader.onloadend = function (e) {
+          var result = JSON.parse(this.result);
+          Registry.viewManager.loadDeviceFromJSON(result);
+          Registry.viewManager.switchTo2D();
+        };
+
+        try {
+          reader.readAsText(f);
+        } catch (err) {
+          console.log("unable to load JSON: " + f);
+        }
+      });
     }
     /**
      * Closes the params window
@@ -95824,4 +95813,4 @@ function () {
 
 exports.default = ViewManager;
 
-},{"../core/customComponent":248,"../core/device":249,"../core/dxfObject":250,"../core/edgeFeature":251,"../core/registry":264,"../utils/htmlUtils":279,"../utils/simpleQueue":282,"./customComponentManager":284,"./designHistory":285,"./mouseAndKeyboardHandler":287,"./tools/cellPositionTool":298,"./tools/channelTool":299,"./tools/componentPositionTool":300,"./tools/connectionTool":301,"./tools/customComponentPositionTool":302,"./tools/generateArrayTool":303,"./tools/insertTextTool":304,"./tools/mouseSelectTool":305,"./tools/moveTool":307,"./tools/multilayerPositionTool":308,"./tools/positionTool":310,"./tools/selectTool":311,"./tools/valveInsertionTool":312,"./ui/borderSettingDialog":313,"./ui/changeAllDialog":314,"./ui/componentToolBar":315,"./ui/editDeviceDialog":317,"./ui/layerToolBar":320,"./ui/manufacturingPanel":321,"./ui/resolutionToolBar":324,"./ui/rightPanel":326,"./ui/zoomToolBar":327,"paper":194}]},{},[244]);
+},{"../core/customComponent":248,"../core/device":249,"../core/dxfObject":250,"../core/edgeFeature":251,"../core/registry":264,"../utils/htmlUtils":279,"../utils/simpleQueue":282,"./customComponentManager":284,"./designHistory":285,"./mouseAndKeyboardHandler":287,"./tools/cellPositionTool":297,"./tools/channelTool":298,"./tools/componentPositionTool":299,"./tools/connectionTool":300,"./tools/customComponentPositionTool":301,"./tools/generateArrayTool":302,"./tools/insertTextTool":303,"./tools/mouseSelectTool":304,"./tools/moveTool":306,"./tools/multilayerPositionTool":307,"./tools/positionTool":309,"./tools/selectTool":310,"./tools/valveInsertionTool":311,"./ui/borderSettingDialog":312,"./ui/changeAllDialog":313,"./ui/componentToolBar":314,"./ui/editDeviceDialog":316,"./ui/exportPanel":317,"./ui/layerToolBar":321,"./ui/manufacturingPanel":322,"./ui/resolutionToolBar":325,"./ui/rightPanel":327,"./ui/zoomToolBar":328,"paper":194}]},{},[244]);
