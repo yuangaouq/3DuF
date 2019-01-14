@@ -16,6 +16,12 @@ export  default class Port extends Template{
             "height": "Float"
         };
 
+        this.__defaults = {
+            "portRadius": .7 * 1000,
+            "height": 1.1 * 1000
+        };
+
+
         this.__units = {
             "portRadius": "&mu;m",
             "height": "&mu;m"

@@ -12,6 +12,11 @@ export  default class Channel extends Template{
             "end": "Point"
         };
 
+        this.__defaults = {
+            "channelWidth": .80 * 1000,
+            "height": .1 * 1000
+        };
+
         this.__heritable = {
             "channelWidth": "Float",
             "height": "Float"
