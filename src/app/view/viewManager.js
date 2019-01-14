@@ -438,7 +438,6 @@ export default class ViewManager {
     }
 
     updateTarget(featureType, featureSet, position, refresh = true) {
-        console.log(featureType,featureSet);
         this.view.addTarget(featureType, featureSet, position);
         this.view.updateAlignmentMarks();
         this.refresh(refresh);

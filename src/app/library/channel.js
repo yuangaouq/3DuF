@@ -81,7 +81,6 @@ export  default class Channel extends Template{
     }
 
     render2DTarget(key, params){
-        console.log("params", params);
         let thickness = params["channelWidth"]/5;
         let length = params["channelWidth"];
         let x = params["position"][0];

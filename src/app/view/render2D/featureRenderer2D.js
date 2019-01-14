@@ -41,7 +41,6 @@ function getFeatureRenderer(typeString, setString) {
     else
     {
         let rendererInfo = FeatureSets.getRender2D(typeString, setString);
-        console.log("Renderer Info"); //Does it work from here ?
         return rendererInfo;
     }
 }

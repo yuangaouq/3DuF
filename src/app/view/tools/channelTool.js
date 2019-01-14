@@ -64,7 +64,6 @@ export default class ChannelTool extends MouseTool {
 
 	showTarget(point) {
 		let target = ChannelTool.getTarget(this.lastPoint);
-		console.log("Type String", this.typeString);
 		Registry.viewManager.updateTarget(this.typeString, this.setString, target);
 	}
 
