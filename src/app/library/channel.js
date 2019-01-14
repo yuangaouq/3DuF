@@ -44,6 +44,17 @@ export  default class Channel extends Template{
             end: "end"
         };
 
+        this.__featureParams = {
+            start: "start",
+            end: "end",
+            width: "channelWidth"
+        };
+
+        this.__targetParams = {
+            diameter: "channelWidth",
+            channelWidth: "channelWidth"
+        };
+
     }
 
     render2D(key, params) {
@@ -70,7 +81,16 @@ export  default class Channel extends Template{
     }
 
     render2DTarget(key, params){
-        let render = this.render2D(key, params);
-        render.fillColor.alpha = 0.5;
+        console.log("params", params);
+        let thickness = params["channelWidth"]/5;
+        let length = params["channelWidth"];
+        let x = params["position"][0];
+        let y = params["position"][1];
+        let color = params["color"];
+        var chair = new paper.Path.Rectangle(x - length/2, y - thickness/2, length, thickness);
+        chair = chair.unite(new paper.Path.Rectangle(x - thickness/2, y - length/2, thickness, length));
+        chair.fillColor = color;
+        chair.fillColor.alpha = 0.5;
+        return chair;
     }
 }

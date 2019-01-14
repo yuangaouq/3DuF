@@ -41,25 +41,26 @@ function getFeatureRenderer(typeString, setString) {
     else
     {
         let rendererInfo = FeatureSets.getRender2D(typeString, setString);
+        console.log("Renderer Info"); //Does it work from here ?
         return rendererInfo;
     }
 }
 
 function getPrimitive2D(typeString, setString) {
-    return PrimitiveSets2D[setString][typeString];
+    console.log("What are Primitive sets ?", PrimitiveSets2D);
+    //return PrimitiveSets2D[setString][typeString]; //Looks like the primitivesets2d are the function pointers
 }
 
 function renderTarget(typeString, setString, position) {
     let renderer = getFeatureRenderer(typeString, setString);
     let params = renderer.targetParams;
-    let prim = getPrimitive2D(renderer.targetPrimitiveType, renderer.targetPrimitiveSet);
     let primParams = {};
     for (let key in params) {
         primParams[key] = getDefaultValueForType(typeString, setString, params[key]);
     }
     primParams["position"] = position;
     primParams["color"] = Colors.getDefaultFeatureColor(typeString, setString, Registry.currentLayer);
-    let rendered = prim(primParams);
+    let rendered = renderer.render2DTarget(null, primParams);
     return rendered;
 }
 

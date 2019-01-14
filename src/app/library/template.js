@@ -8,7 +8,31 @@ export default class Template {
         this.__units = null;
         this.__placementTool = null;
         this.__toolParams = null;//{ position: "position" };
+        this.__featureParams = null;
+        this.__targetParams = null
         this.__setupDefinitions();
+    }
+
+    /**
+     * TODO - Remove this thing's dependency
+     */
+    get featureParams(){
+        if(this.__featureParams == null){
+            throw new Error("placementtool cannot be null instantiate in the __setupDefinitions");
+        }
+
+        return this.__featureParams;
+    }
+
+    /**
+     * TODO - Remove this thing's dependency
+     */
+    get targetParams(){
+        if(this.__targetParams == null){
+            throw new Error("placementtool cannot be null instantiate in the __setupDefinitions");
+        }
+
+        return this.__targetParams;
     }
 
     get placementTool(){
@@ -92,5 +116,10 @@ export default class Template {
      */
     render2D(key, params){
         throw new  Error ("User needs to provide method for component definition, look at examples");
+    }
+
+
+    render2DTarget(key, params){
+        throw new Error("User needs to provide method for component definition, look at examples");
     }
 }
